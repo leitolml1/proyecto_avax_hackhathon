@@ -12,15 +12,37 @@ describe("P2PEscrow", function () {
 
   it("creates a trade with the caller as buyer", async function () {
     const { escrow, buyer, seller } = await deployFixture();
+    const productId = "product-123";
 
-    await expect(escrow.connect(buyer).createTrade(seller.address))
+    const tx = await escrow.connect(buyer).createTrade(seller.address, productId);
+    const receipt = await tx.wait();
+    const block = await ethers.provider.getBlock(receipt.blockNumber);
+
+    await expect(tx)
       .to.emit(escrow, "TradeCreated")
-      .withArgs(0, seller.address, buyer.address);
+      .withArgs(0, seller.address, buyer.address, productId);
 
     const trade = await escrow.trades(0);
     expect(trade.seller).to.equal(seller.address);
     expect(trade.buyer).to.equal(buyer.address);
     expect(trade.amount).to.equal(0);
+    expect(trade.productId).to.equal(productId);
+    expect(trade.createdAt).to.equal(block.timestamp);
+    expect(trade.status).to.equal(0);
+  });
+
+  it("returns all trade data with getTrade", async function () {
+    const { escrow, buyer, seller } = await deployFixture();
+    const productId = "sku-front-001";
+
+    await escrow.connect(buyer).createTrade(seller.address, productId);
+
+    const trade = await escrow.getTrade(0);
+    expect(trade.seller).to.equal(seller.address);
+    expect(trade.buyer).to.equal(buyer.address);
+    expect(trade.amount).to.equal(0);
+    expect(trade.productId).to.equal(productId);
+    expect(trade.createdAt).to.be.greaterThan(0);
     expect(trade.status).to.equal(0);
   });
 
@@ -28,7 +50,7 @@ describe("P2PEscrow", function () {
     const { escrow, buyer, seller, other } = await deployFixture();
     const amount = ethers.parseEther("1");
 
-    await escrow.connect(buyer).createTrade(seller.address);
+    await escrow.connect(buyer).createTrade(seller.address, "product-123");
 
     await expect(
       escrow.connect(other).fundTrade(0, { value: amount }),
@@ -47,7 +69,7 @@ describe("P2PEscrow", function () {
     const { escrow, buyer, seller } = await deployFixture();
     const amount = ethers.parseEther("1");
 
-    await escrow.connect(buyer).createTrade(seller.address);
+    await escrow.connect(buyer).createTrade(seller.address, "product-123");
     await escrow.connect(buyer).fundTrade(0, { value: amount });
 
     const releaseTx = escrow.connect(buyer).confirmDelivery(0);
@@ -65,7 +87,7 @@ describe("P2PEscrow", function () {
   it("prevents non-buyers from confirming delivery", async function () {
     const { escrow, buyer, seller, other } = await deployFixture();
 
-    await escrow.connect(buyer).createTrade(seller.address);
+    await escrow.connect(buyer).createTrade(seller.address, "product-123");
     await escrow.connect(buyer).fundTrade(0, { value: ethers.parseEther("1") });
 
     await expect(escrow.connect(other).confirmDelivery(0)).to.be.revertedWith(
@@ -76,7 +98,7 @@ describe("P2PEscrow", function () {
   it("cancels only trades that are not funded", async function () {
     const { escrow, buyer, seller } = await deployFixture();
 
-    await escrow.connect(buyer).createTrade(seller.address);
+    await escrow.connect(buyer).createTrade(seller.address, "product-123");
 
     await expect(escrow.connect(buyer).cancelTrade(0))
       .to.emit(escrow, "TradeCancelled")
@@ -84,7 +106,7 @@ describe("P2PEscrow", function () {
 
     expect((await escrow.trades(0)).status).to.equal(3);
 
-    await escrow.connect(buyer).createTrade(seller.address);
+    await escrow.connect(buyer).createTrade(seller.address, "product-456");
     await escrow.connect(buyer).fundTrade(1, { value: ethers.parseEther("1") });
 
     await expect(escrow.connect(buyer).cancelTrade(1)).to.be.revertedWith(

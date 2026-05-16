@@ -15,13 +15,15 @@ contract P2PEscrow {
         address payable seller;
         address buyer;
         uint256 amount;
+        string productId;
+        uint256 createdAt;
         TradeStatus status;
     }
 
     uint256 public nextTradeId;
     mapping(uint256 => Trade) public trades;
 
-    event TradeCreated(uint256 indexed tradeId, address indexed seller, address indexed buyer);
+    event TradeCreated(uint256 indexed tradeId, address indexed seller, address indexed buyer, string productId);
     event TradeFunded(uint256 indexed tradeId, address indexed buyer, uint256 amount);
     event TradeReleased(uint256 indexed tradeId, address indexed seller, uint256 amount);
     event TradeCancelled(uint256 indexed tradeId);
@@ -43,8 +45,9 @@ contract P2PEscrow {
 
     /// @notice Creates a trade. The caller becomes the buyer.
     /// @param seller Address that will receive the escrowed funds after delivery confirmation.
+    /// @param productId Marketplace product identifier associated with this trade.
     /// @return tradeId The id assigned to the new trade.
-    function createTrade(address seller) external returns (uint256 tradeId) {
+    function createTrade(address seller, string memory productId) external returns (uint256 tradeId) {
         require(seller != address(0), "Seller cannot be zero address");
         require(seller != msg.sender, "Buyer cannot be seller");
 
@@ -53,12 +56,14 @@ contract P2PEscrow {
             seller: payable(seller),
             buyer: msg.sender,
             amount: 0,
+            productId: productId,
+            createdAt: block.timestamp,
             status: TradeStatus.Created
         });
 
         nextTradeId++;
 
-        emit TradeCreated(tradeId, seller, msg.sender);
+        emit TradeCreated(tradeId, seller, msg.sender, productId);
     }
 
     /// @notice Funds a created trade. Only the buyer can deposit.
@@ -111,5 +116,25 @@ contract P2PEscrow {
         trades[tradeId].status = TradeStatus.Cancelled;
 
         emit TradeCancelled(tradeId);
+    }
+
+    /// @notice Returns all trade data in a frontend-friendly shape.
+    /// @param tradeId Trade id to read.
+    function getTrade(uint256 tradeId)
+        external
+        view
+        tradeExists(tradeId)
+        returns (
+            address seller,
+            address buyer,
+            uint256 amount,
+            string memory productId,
+            uint256 createdAt,
+            TradeStatus status
+        )
+    {
+        Trade storage trade = trades[tradeId];
+
+        return (trade.seller, trade.buyer, trade.amount, trade.productId, trade.createdAt, trade.status);
     }
 }

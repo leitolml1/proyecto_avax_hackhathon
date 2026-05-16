@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { OrderState } from '../entities/ordene.entity';
 
 export class CreateOrdenDto {
@@ -10,6 +10,22 @@ export class CreateOrdenDto {
 
   @IsString()
   nro_pedido: string;
+
+  @IsOptional()
+  @IsString()
+  tradeId?: string;
+
+  @IsOptional()
+  @IsString()
+  escrowTxHash?: string;
+
+  @IsOptional()
+  @IsString()
+  fundTxHash?: string;
+
+  @IsOptional()
+  @IsNumber()
+  amountAvax?: number;
 
   @IsOptional()
   @IsEnum(OrderState)

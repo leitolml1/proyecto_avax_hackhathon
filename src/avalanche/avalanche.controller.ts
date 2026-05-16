@@ -12,11 +12,25 @@ export class AvalancheController {
   async getBlock() {
     return await this.avalancheService.getBlockNumber();
   }
-  @Get("balance/:address")
-    async balance(
-        @Param("address") address:string
-    ){
-        return this.avalancheService.getBalance(address)
-    }
+
+  @Get('contract')
+  contract() {
+    return this.avalancheService.getContractAddress();
+  }
+
+  @Get('abi')
+  abi() {
+    return this.avalancheService.getEscrowAbi();
+  }
+
+  @Get('trade/:tradeId')
+  trade(@Param('tradeId') tradeId: string) {
+    return this.avalancheService.getTrade(tradeId);
+  }
+
+  @Get('balance/:address')
+  async balance(@Param('address') address: string) {
+    return this.avalancheService.getBalance(address);
+  }
   
 }

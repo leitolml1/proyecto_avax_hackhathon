@@ -30,6 +30,26 @@ export class Orden {
   @Column('text')
   nro_pedido: string;
 
+  @Column('text', {
+    nullable: true,
+  })
+  tradeId?: string;
+
+  @Column('text', {
+    nullable: true,
+  })
+  escrowTxHash?: string;
+
+  @Column('text', {
+    nullable: true,
+  })
+  fundTxHash?: string;
+
+  @Column('decimal', {
+    nullable: true,
+  })
+  amountAvax?: number;
+
   @Column({
     type: 'enum',
     enum: OrderState,

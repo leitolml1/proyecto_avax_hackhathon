@@ -28,6 +28,21 @@ export class ProductosController {
     });
   }
 
+  @Post('seed')
+  seed(@Body() body: { seller: string }) {
+    return this.productosService.create({
+      name: 'Producto Test Escrow',
+      seller: body.seller,
+      price: 0.0001,
+      description: 'Producto de prueba para testear escrow con AVAX mínimo',
+      category: 'Electrónica',
+      subcategory: 'Accesorios',
+      condition: 'Nuevo',
+      location: 'Fuji Testnet',
+      image_url: 'https://placehold.co/400x400/1e1e24/6b7280?text=Test+Escrow',
+    });
+  }
+
   @Get()
   findAllProducts() {
     return this.productosService.findAllProducts();

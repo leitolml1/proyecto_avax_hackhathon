@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: avasafe-backend
+    runtime: node
+    repo: https://github.com/tu-usuario/tu-repo
+    rootDir: proyecto_avax_hackhathon
+    buildCommand: npm install && npm run build
+    startCommand: node dist/main
+    envVars:
+      - key: DB_HOST
+        value: db.saicezcoaoqocwglpozp.supabase.co
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_USERNAME
+        value: postgres
+      - key: DB_PASSWORD
+        value: kP9#vX2!mL7$qZ4*wY1_bN8
+      - key: DB_DATABASE
+        value: postgres
+      - key: DB_SSL
+        value: "true"
+      - key: PORT
+        value: "3000"
+      - key: ESCROW_CONTRACT_ADDRESS
+        value: 0x704C990C58Da4dB2309973bc906206FDbc4a4375
+      - key: URL_FUJI
+        value: https://api.avax-test.network/ext/bc/C/rpc
+      - key: JWT_SECRET
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false

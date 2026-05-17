@@ -16,8 +16,23 @@ export class Producto {
   @Column('text')
   seller: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   nro_pedido: string;
+
+  @Column('text', { nullable: true })
+  description: string;
+
+  @Column('text', { nullable: true })
+  category: string;
+
+  @Column('text', { nullable: true })
+  subcategory: string;
+
+  @Column('text', { nullable: true })
+  condition: string;
+
+  @Column('text', { nullable: true })
+  location: string;
 
   @Column('decimal')
   price: number;
@@ -25,8 +40,6 @@ export class Producto {
   @CreateDateColumn()
   create: Date;
 
-  @Column({
-    nullable: true,
-  })
+  @Column({ nullable: true })
   image_url: string;
 }

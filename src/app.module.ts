@@ -27,9 +27,7 @@ import { Orden } from './ordenes/entities/ordene.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      ...(process.env.DB_SSL === 'true' ? { ssl: { rejectUnauthorized: false } } : {}),
       entities: [Producto, Usuario, Orden],
       synchronize: true,
     }),

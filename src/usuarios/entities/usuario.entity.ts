@@ -7,24 +7,8 @@ import {
 
 @Entity()
 export class Usuario {
-
-  @PrimaryColumn(
-    {unique:true}
-  )
+  @PrimaryColumn()
   address: string;
-
-  @Column({
-    unique: true,
-  })
-  username: string;
-
-  @Column({
-    unique: true,
-  })
-  email: string;
-
-  @Column()
-  password: string;
 
   @Column("text", {
     array: true,

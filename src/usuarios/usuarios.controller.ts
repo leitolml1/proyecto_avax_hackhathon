@@ -1,29 +1,22 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UsuariosService } from './usuarios.service';
-import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
-import { LoginUsuarioDto } from './dto/login-usuario.dto';
+import { WalletAuthDto } from './dto/wallet-auth.dto';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
 
-  
-
-  
-  @Post()
-  create(@Body() createUsuarioDto: CreateUsuarioDto) {
-    return this.usuariosService.create(createUsuarioDto);
-  }
-  @Post('logout')
-  logout() {
-    return this.usuariosService.logout();
+  @Post('wallet-auth')
+  walletAuth(@Body() dto: WalletAuthDto) {
+    return this.usuariosService.walletAuth(dto);
   }
 
-  @Post("login")
-  login(@Body() loginUsuarioDto:LoginUsuarioDto){
-    return this.usuariosService.login(loginUsuarioDto)
+  @Get('nonce/:address')
+  getNonce(@Param('address') address: string) {
+    return this.usuariosService.generateNonce(address);
   }
+
   @Get()
   findAll() {
     return this.usuariosService.findAll();
